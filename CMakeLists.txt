@@ -10,3 +10,5 @@ add_executable (
     src/string_util.hpp
     src/string_util.cpp
 )
+
+target_link_libraries(math_parser -static)
