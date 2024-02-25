@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
         if (expr == "exit")
             break;
         else if (expr == "clear") {
-            std::cout << "\033[2J\033[H";
+            system("cls");
             std::cout << "Enter 'exit' to leave or 'clear' to clear" << std::endl;
             continue;
         }
