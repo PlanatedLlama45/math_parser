@@ -5,6 +5,7 @@
 #include <map>
 #include <regex>
 #include <cstring>
+#include <Windows.h>
 #include "string_util.hpp"
 
 namespace MathParser {
