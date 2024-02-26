@@ -10,7 +10,7 @@
 Напрямую возвращает результат выражения
 
 ### MathParser::Exception
-Тип исключенияпробрасваемый в MathParser::parseExpression и MathParser::solveExpression
+Тип исключения пробрасваемый в MathParser::parseExpression и MathParser::solveExpression
 
 ## Поддерживаемые функции
 - Арифметика (+, -, *, / и ^)
