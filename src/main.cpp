@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ast.hpp"
+#include "math_parser.hpp"
 
 int main(int argc, char **argv) {
     std::cout << "Enter 'exit' to leave or 'clear' to clear" << std::endl;

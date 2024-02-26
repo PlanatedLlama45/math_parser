@@ -5,6 +5,9 @@ add_executable (
     math_parser
     
     src/main.cpp
+
+    src/math_parser.hpp
+    
     src/ast.hpp
     src/ast.cpp
     src/string_util.hpp
