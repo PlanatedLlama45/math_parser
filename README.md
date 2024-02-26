@@ -13,13 +13,13 @@
 Тип исключенияпробрасваемый в MathParser::parseExpression и MathParser::solveExpression
 
 ## Поддерживаемые функции
-- Арифметика (+, -, *, / and ^)
-- Модуль (%, mod or mod(a, b))
+- Арифметика (+, -, *, / и ^)
+- Модуль (%, mod и mod(a, b))
 - Корни (sqrt(x), cbrt(x), root(n, x))
 - Тригонометрия:
     - Обычная (sin, cos, etc.)
-    - Гиперболическая (sinh, cosh, etc.)
-    - Обратная (arcsin/asin, arsinh, arcosh, atan2(y, x), etc.)
+    - Гиперболическая (sinh, cosh, и т.п.)
+    - Обратная (arcsin/asin, arsinh, arcosh, atan2(y, x), и т.п.)
 - Логарифмы (ln(x), lg(x), log(b, x))
 - Комбинаторика (ncr(a, b), npr(a, b))
 
