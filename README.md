@@ -1,13 +1,50 @@
+# Парсер математических выражений
+Он умеет математику
+
+## Основные функции/типы данных
+
+### MathParser::parseExpression(expr)
+Возвращает пойнтер на MathParser::Base_AST (или nullptr если что-то пошло не так)
+
+### MathParser::solveExpression(expr)
+Напрямую возвращает результат выражения
+
+### MathParser::Exception
+Тип исключенияпробрасваемый в MathParser::parseExpression и MathParser::solveExpression
+
+## Поддерживаемые функции
+- Арифметика (+, -, *, / and ^)
+- Модуль (%, mod or mod(a, b))
+- Корни (sqrt(x), cbrt(x), root(n, x))
+- Тригонометрия:
+    - Обычная (sin, cos, etc.)
+    - Гиперболическая (sinh, cosh, etc.)
+    - Обратная (arcsin/asin, arsinh, arcosh, atan2(y, x), etc.)
+- Логарифмы (ln(x), lg(x), log(b, x))
+- Комбинаторика (ncr(a, b), npr(a, b))
+
+## Поддерживаемые константы
+- pi (Ну камон) = 3.1415926...
+- tau (pi * 2) = 6.2831855...
+- phi (Золотое сечение) = 1.6180339...
+- c (Скорость света в вакууме) = 299792458
+- G (Гравитационная постоянная Ньютона) = 6.6743015 e-11
+- g (Ускорение свободного падения на Земле) = 9.80665
+- Mp (Масса протона) = 1.6726219... e-27
+- Mn (Масса нейтрона) = 1.6749274... e-27
+
+
+
 # Math Parser
 It knows how to do math.
 
 ## Main functions/data types
 
 ### MathParser::parseExpression(expr)
-It returns a MathParser::Base_AST pointer (or nullptr is something went wrong) based on the equation
+It returns a MathParser::Base_AST pointer (or nullptr if something went wrong) based on the equation
 
 ### MathParser::solveExpression(expr)
-It is a shortcut to immediately evaluate the expression
+Directly evaluates the expression
 
 ### MathParser::Exception
 Is an exception type thrown by MathParser::parseExpression and MathParser::solveExpression
