@@ -140,32 +140,15 @@ Base_AST *parseExpression(std::string expr) {
                     )
                 ) continue;
                 
-                if (isBinary) {
-                    if (!isFunction) {
-                        std::string oper = getSubString(expr, i, j);
-                        if (PEMDAS[oper] != 0 && PEMDAS[oper] < lowest) {
-                            li = i;
-                            lj = j;
-                            lowest = PEMDAS[oper];
-                        }
-                        if (lowest == 1)
-                            break;
-                    } else {
+                if (isBinary && !isFunction) {
+                    std::string oper = getSubString(expr, i, j);
+                    if (PEMDAS[oper] != 0 && PEMDAS[oper] < lowest) {
                         li = i;
                         lj = j;
-                        k = j;
-                        for (;; k++) {
-                            if (expr[k] == '(')
-                                depth++;
-                            else if (expr[k] == ')')
-                                depth--;
-                            
-                            if (depth == 0)
-                                break;
-                        }
-                        lk = k;
-                        break;
+                        lowest = PEMDAS[oper];
                     }
+                    if (lowest == 1)
+                        break;
                 } else {
                     li = i;
                     lj = j;
