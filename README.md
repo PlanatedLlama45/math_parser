@@ -30,5 +30,5 @@ Is an exception type thrown by MathParser::parseExpression and MathParser::solve
 - c (The speed of light in vaccuum) = 299792458
 - G (Newton's gravitational constant) = 6.6743015 e-11
 - g (Earth's free fall acceleration) = 9.80665
-- Mp (The mass of a proton) = 1.6726219... e27
+- Mp (The mass of a proton) = 1.6726219... e-27
 - Mn (The mass of a neutron) = 1.6749274... e-27
