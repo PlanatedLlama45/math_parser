@@ -37,7 +37,7 @@ std::regex numberRegex("^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)(e[0-9]+)?$");
 
 // Functions
 
-double solveExpression(std::string expr) {
+double solveExpression(std::string expr, Unit unit) {
     using namespace StringUtil;
     removeChar(expr, ' ');
     if (expr == "")
@@ -53,7 +53,7 @@ double solveExpression(std::string expr) {
         return 4.;
     }
 
-    Base_AST *ast = parseExpression(expr);
+    Base_AST *ast = parseExpression(expr, unit);
 
     if (ast == nullptr)
         throw Exception("Unexpected error");
@@ -63,7 +63,7 @@ double solveExpression(std::string expr) {
     return res;
 }
 
-Base_AST *parseExpression(std::string expr) {
+Base_AST *parseExpression(std::string expr, Unit unit) {
     using namespace StringUtil;
     // Trim excess characters
     {
@@ -86,18 +86,38 @@ Base_AST *parseExpression(std::string expr) {
     // *std::cout << expr << '\n';
 
     // Return 'Value_AST' if is a number
-    if (std::regex_match(expr, numberRegex))
+    if (std::regex_match(expr, numberRegex)) {
+        if (unit == Unit::Degrees)
+            return new Value_AST(rad2deg(std::stod(expr)));
         return new Value_AST(std::stod(expr));
+    }
 
     // Return 'Value_AST' if is a constant
-    if (constants[expr] != 0.)
+    if (constants[expr] != 0.) {
+        if (unit == Unit::Degrees)
+            return new Value_AST(rad2deg(constants[expr]));
         return new Value_AST(constants[expr]);
+    }
     
     // Return 'Value_AST' if is in degrees
     if (expr.length() > 3 &&
         getSubString(expr, expr.length() - 3, expr.length()) == "deg" &&
         std::regex_match(getSubString(expr, 0, expr.length() - 3), numberRegex)
-    ) return new Value_AST(deg2rad(std::stod(getSubString(expr, 0, expr.length() - 3))));
+    ) {
+        if (unit == Unit::Degrees)
+            return new Value_AST(std::stod(getSubString(expr, 0, expr.length() - 3)));
+        return new Value_AST(deg2rad(std::stod(getSubString(expr, 0, expr.length() - 3))));
+    }
+
+    // Return 'Value_AST' if is in radians
+    if (expr.length() > 3 &&
+        getSubString(expr, expr.length() - 3, expr.length()) == "rad" &&
+        std::regex_match(getSubString(expr, 0, expr.length() - 3), numberRegex)
+    ) {
+        if (unit == Unit::Radians)
+            return new Value_AST(std::stod(getSubString(expr, 0, expr.length() - 3)));
+        return new Value_AST(rad2deg(std::stod(getSubString(expr, 0, expr.length() - 3))));
+    }
     
     // Get lowest order operation
     {
@@ -170,20 +190,20 @@ Base_AST *parseExpression(std::string expr) {
         if (isBinary) {
             std::string oper = getSubString(expr, li, lj);
             if (contains(binaryOperators, oper)) {
-                Base_AST *first = parseExpression(getSubString(expr, 0, li));
-                Base_AST *second = parseExpression(getSubString(expr, lj, expr.length()));
+                Base_AST *first = parseExpression(getSubString(expr, 0, li), unit);
+                Base_AST *second = parseExpression(getSubString(expr, lj, expr.length()), unit);
                 return (first == nullptr || second == nullptr) ? nullptr : new Binary_AST(oper, first, second);
             } else if (contains(binaryFunctions, oper)) {
                 auto args = splitAt(getSubString(expr, lj + 1, lk), ',');
                 if (args.size() != 2)
                     throw Exception("Incorrect amount of arguments");
-                Base_AST *first = parseExpression(args[0]);
-                Base_AST *second = parseExpression(args[1]);
+                Base_AST *first = parseExpression(args[0], unit);
+                Base_AST *second = parseExpression(args[1], unit);
                 return (first == nullptr || second == nullptr) ? nullptr : new Binary_AST(oper, first, second);
             }
         } else {
             std::string oper = getSubString(expr, li, lj);
-            Base_AST *inner = parseExpression(getSubString(expr, lj + 1, lk));
+            Base_AST *inner = parseExpression(getSubString(expr, lj + 1, lk), unit);
             return (inner == nullptr) ? nullptr : new Unary_AST(oper, inner);
         }
     }

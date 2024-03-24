@@ -32,11 +32,11 @@ extern std::regex numberRegex;
 */
 class Base_AST {
 public:
-    Base_AST(void);
-    ~Base_AST(void);
+    Base_AST();
+    ~Base_AST();
 
     // Находит значение Абстрактного Синтаксического Дерева (АСД)
-    virtual double getValue(void);
+    virtual double getValue();
 
 protected:
     // Найти значение унарной функции по имени
@@ -53,10 +53,10 @@ protected:
 class Value_AST : public Base_AST {
 public:
     Value_AST(double value);
-    ~Value_AST(void);
+    ~Value_AST();
 
     // Находит значение Абстрактного Синтаксического Дерева (АСД)
-    double getValue(void) override;
+    double getValue() override;
 
 private:
     double value;
@@ -70,10 +70,10 @@ private:
 class Unary_AST : public Base_AST {
 public:
     Unary_AST(std::string function, Base_AST *inner);
-    ~Unary_AST(void);
+    ~Unary_AST();
 
     // Находит значение Абстрактного Синтаксического Дерева (АСД)
-    double getValue(void) override;
+    double getValue() override;
 
 private:
     std::string function;
@@ -88,10 +88,10 @@ private:
 class Binary_AST : public Base_AST {
 public:
     Binary_AST(std::string operation, Base_AST *first, Base_AST *second);
-    ~Binary_AST(void);
+    ~Binary_AST();
 
     // Находит значение Абстрактного Синтаксического Дерева (АСД)
-    double getValue(void) override;
+    double getValue() override;
 
 private:
     std::string operation;
@@ -107,10 +107,10 @@ private:
 class Exception : public std::exception {
 public:
     Exception(const char *message);
-    ~Exception(void);
+    ~Exception();
 
     // Возвращает сообщение исключения
-    inline const char *what(void) const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override { return message; };
+    inline const char *what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_NOTHROW override { return message; };
 
 private:
     char *message;
@@ -118,11 +118,14 @@ private:
 };
 
 
+// Энумерация единиц измерения углов
+enum class Unit { Any, Degrees, Radians };
+
 // Находит значение выражение
-extern double solveExpression(std::string expr);
+extern double solveExpression(std::string expr, Unit unit = Unit::Any);
 
 // Парсит выражение и возвращает АСД
-extern Base_AST *parseExpression(std::string expr);
+extern Base_AST *parseExpression(std::string expr, Unit unit = Unit::Any);
 
 // Проверяет действительно ли выражение (пока что проверяет только скобки)
 extern bool isValidExpression(std::string expr);
@@ -130,6 +133,9 @@ extern bool isValidExpression(std::string expr);
 
 // Переводит градусы в радианы
 inline double deg2rad(double deg) { return deg * M_PI / 180.0; }
+
+// Переводит радианы в градусы
+inline double rad2deg(double rad) { return rad * 180.0 / M_PI; }
 
 // Возвращает факториал действительного числа
 inline double fact(double x) { return std::tgamma(x + 1); }
@@ -251,11 +257,14 @@ private:
 };
 
 
+// Enumeration of angle measurment units
+enum class Unit { Any, Degrees, Radians };
+
 // Evaluates the expression
-extern double solveExpression(std::string expr);
+extern double solveExpression(std::string expr, Unit unit = Unit::Any);
 
 // Parses the expression and returns an AST
-extern Base_AST *parseExpression(std::string expr);
+extern Base_AST *parseExpression(std::string expr, Unit unit = Unit::Any);
 
 // Checks if an expression is valid (for now only checks parenthesis)
 extern bool isValidExpression(std::string expr);
@@ -263,6 +272,9 @@ extern bool isValidExpression(std::string expr);
 
 // Converts degrees to radians
 inline double deg2rad(double deg) { return deg * M_PI / 180.0; }
+
+// Converts radians to degrees
+inline double rad2deg(double rad) { return rad * 180.0 / M_PI; }
 
 // Returns a factorial of a double
 inline double fact(double x) { return std::tgamma(x + 1); }
