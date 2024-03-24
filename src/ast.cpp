@@ -233,7 +233,7 @@ double Base_AST::getValue(void) {
     return 0.0;
 }
 
-double Base_AST::applyUnary(std::string fun, double arg) {
+double Base_AST::applyUnary(std::string fun, double arg, Unit unit) {
     // Algebra / Calculus
     if (fun == "sqrt")
         return std::sqrt(arg);
@@ -245,75 +245,104 @@ double Base_AST::applyUnary(std::string fun, double arg) {
         return std::log(arg);
 
     // Trig
+    double res = 0.0;
+    bool inverse = false;
     // Normal trig
-    else if (fun == "sin")
-        return std::sin(arg);
+    if (fun == "sin")
+        res = std::sin(arg);
     else if (fun == "cos")
-        return std::cos(arg);
+        res = std::cos(arg);
     else if (fun == "tan" || fun == "tg")
-        return std::tan(arg);
+        res = std::tan(arg);
 
     // Complements
     else if (fun == "csc" || fun == "cosec")
-        return 1. / std::sin(arg);
+        res = 1. / std::sin(arg);
     else if (fun == "sec")
-        return 1. / std::cos(arg);
+        res = 1. / std::cos(arg);
     else if (fun == "cot" || fun == "ctg" || fun == "cotan")
-        return 1. / std::tan(arg);
+        res = 1. / std::tan(arg);
 
     // Hyperbolic trig
     else if (fun == "sinh" || fun == "sh")
-        return std::sinh(arg);
+        res = std::sinh(arg);
     else if (fun == "cosh" || fun == "ch")
-        return std::cosh(arg);
+        res = std::cosh(arg);
     else if (fun == "tanh" || fun == "th")
-        return std::tanh(arg);
+        res = std::tanh(arg);
 
     // Complements    
     else if (fun == "csch" || fun == "cosech")
-        return 1. / std::sinh(arg);
+        res = 1. / std::sinh(arg);
     else if (fun == "sech" || fun == "sch")
-        return 1. / std::cosh(arg);
+        res = 1. / std::cosh(arg);
     else if (fun == "coth" || fun == "cth")
-        return 1. / std::tanh(arg);
+        res = 1. / std::tanh(arg);
 
     // Inverse trig
     // Normal trig
-    else if (fun == "arcsin" || fun == "asin")
-        return std::asin(arg);
-    else if (fun == "arccos" || fun == "acos")
-        return std::acos(arg);
-    else if (fun == "arctan" || fun == "arctg" || fun == "atan")
-        return std::tan(arg);
+    else if (fun == "arcsin" || fun == "asin") {
+        res = std::asin(arg);
+        inverse = true;
+    }
+    else if (fun == "arccos" || fun == "acos") {
+        res = std::acos(arg);
+        inverse = true;
+    }
+    else if (fun == "arctan" || fun == "arctg" || fun == "atan") {
+        res = std::tan(arg);
+        inverse = true;
+    }
 
     // Complements
-    else if (fun == "arcsc" || fun == "arccosec")
-        return std::asin(1. / arg);
-    else if (fun == "arsec" || fun == "arcsec")
-        return std::acos(1. / arg);
-    else if (fun == "arccot" || fun == "arcctg" || fun == "arccotan")
-        return std::atan(1. / arg);
+    else if (fun == "arcsc" || fun == "arccosec") {
+        res = std::asin(1. / arg);
+        inverse = true;
+    }
+    else if (fun == "arsec" || fun == "arcsec") {
+        res = std::acos(1. / arg);
+        inverse = true;
+    }
+    else if (fun == "arccot" || fun == "arcctg" || fun == "arccotan") {
+        res = std::atan(1. / arg);
+        inverse = true;
+    }
 
     // Hyperbolic trig
-    else if (fun == "arsinh" || fun == "arsh")
-        return std::asinh(arg);
-    else if (fun == "arcosh" || fun == "arch")
-        return std::acosh(arg);
-    else if (fun == "artanh" || fun == "arth")
-        return std::atanh(arg);
+    else if (fun == "arsinh" || fun == "arsh") {
+        res = std::asinh(arg);
+        inverse = true;
+    }
+    else if (fun == "arcosh" || fun == "arch") {
+        res = std::acosh(arg);
+        inverse = true;
+    }
+    else if (fun == "artanh" || fun == "arth") {
+        res = std::atanh(arg);
+        inverse = true;
+    }
 
     // Complements    
-    else if (fun == "arcsch" || fun == "arcosech")
-        return std::asinh(1. / arg);
-    else if (fun == "arsech" || fun == "arsch")
-        return std::acosh(1. / arg);
-    else if (fun == "arcoth" || fun == "arcth")
-        return std::atanh(1. / arg);
+    else if (fun == "arcsch" || fun == "arcosech") {
+        res = std::asinh(1. / arg);
+        inverse = true;
+    }
+    else if (fun == "arsech" || fun == "arsch") {
+        res = std::acosh(1. / arg);
+        inverse = true;
+    }
+    else if (fun == "arcoth" || fun == "arcth") {
+        res = std::atanh(1. / arg);
+        inverse = true;
+    }
 
-    return 0.;
+    if (inverse && unit == Unit::Degrees)
+        res = rad2deg(res);
+
+    return res;
 }
 
-double Base_AST::applyBinary(std::string fun, double arg1, double arg2) {
+double Base_AST::applyBinary(std::string fun, double arg1, double arg2, Unit unit) {
     // Arithmetic
     if (fun == "+")
         return arg1 + arg2;
@@ -341,8 +370,12 @@ double Base_AST::applyBinary(std::string fun, double arg1, double arg2) {
         return nCr(arg1, arg2);
     
     // Trig
-    else if (fun == "atan2" || fun == "arctan2")
-        return std::atan2(arg1, arg2);
+    else if (fun == "atan2" || fun == "arctan2") {
+        double res = std::atan2(arg1, arg2);
+        if (unit == Unit::Degrees)
+            return rad2deg(res);
+        return res;
+    }
 
     return 0.;
 }
@@ -362,9 +395,10 @@ double Value_AST::getValue(void) {
 
 // Unary_AST
 
-Unary_AST::Unary_AST(std::string function, Base_AST *inner) {
+Unary_AST::Unary_AST(std::string function, Base_AST *inner, Unit unit) {
     this->function = function;
     this->inner = inner;
+    this->unit = unit;
 }
 
 Unary_AST::~Unary_AST(void) {
@@ -372,16 +406,17 @@ Unary_AST::~Unary_AST(void) {
 }
 
 double Unary_AST::getValue(void) {
-    return Base_AST::applyUnary(function, inner->getValue());
+    return Base_AST::applyUnary(function, inner->getValue(), unit);
 }
 
 
 // Binary_AST
 
-Binary_AST::Binary_AST(std::string operation, Base_AST *first, Base_AST *second) {
+Binary_AST::Binary_AST(std::string operation, Base_AST *first, Base_AST *second, Unit unit) {
     this->operation = operation;
     this->first = first;
     this->second = second;
+    this->unit = unit;
 }
 
 Binary_AST::~Binary_AST(void) {
@@ -390,7 +425,7 @@ Binary_AST::~Binary_AST(void) {
 }
 
 double Binary_AST::getValue(void) {
-    return Base_AST::applyBinary(operation, first->getValue(), second->getValue());
+    return Base_AST::applyBinary(operation, first->getValue(), second->getValue(), unit);
 }
 
 Exception::Exception(const char *message) {

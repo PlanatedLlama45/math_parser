@@ -27,35 +27,38 @@ extern std::vector<std::string> binaryFunctions;
 // Регекс для определения является ли строка числом
 extern std::regex numberRegex;
 
+// Энумерация единиц измерения углов
+enum class Unit { Any, Degrees, Radians };
+
 /*
-Родительский класс для Абстрактного Синтаксического Дерева (АСД)
+Родительский класс для АСД
 */
 class Base_AST {
 public:
     Base_AST();
     ~Base_AST();
 
-    // Находит значение Абстрактного Синтаксического Дерева (АСД)
+    // Находит значение АСД
     virtual double getValue();
 
 protected:
     // Найти значение унарной функции по имени
-    static double applyUnary(std::string fun, double arg);
+    static double applyUnary(std::string fun, double arg, Unit unit);
     // Найти значение бинарной функции по имени
-    static double applyBinary(std::string fun, double arg1, double arg2);
+    static double applyBinary(std::string fun, double arg1, double arg2, Unit unit);
 
 };
 
 
 /*
-Узел Абстрактного Синтаксического Дерева (АСД) для хранения значений
+Узел АСД для хранения значений
 */
 class Value_AST : public Base_AST {
 public:
     Value_AST(double value);
     ~Value_AST();
 
-    // Находит значение Абстрактного Синтаксического Дерева (АСД)
+    // Находит значение АСД
     double getValue() override;
 
 private:
@@ -65,39 +68,42 @@ private:
 
 
 /*
-Узел Абстрактного Синтаксического Дерева (АСД) для хранения унарных функций (функций с одним параметром)
+Узел АСД для хранения унарных функций (функций с одним параметром)
 */
 class Unary_AST : public Base_AST {
 public:
-    Unary_AST(std::string function, Base_AST *inner);
+    Unary_AST(std::string function, Base_AST *inner, Unit unit = Unit::Any);
     ~Unary_AST();
 
-    // Находит значение Абстрактного Синтаксического Дерева (АСД)
+    // Находит значение АСД
     double getValue() override;
 
 private:
     std::string function;
     Base_AST *inner;
+    Unit unit;
 
 };
 
 
 /*
-Узел Абстрактного Синтаксического Дерева (АСД) для хранения бинарных функций/операторов (функций с двумя параметрами)
+Узел АСД для хранения бинарных функций/операторов (функций с двумя параметрами)
 */
 class Binary_AST : public Base_AST {
 public:
-    Binary_AST(std::string operation, Base_AST *first, Base_AST *second);
+    Binary_AST(std::string operation, Base_AST *first, Base_AST *second, Unit unit = Unit::Any);
     ~Binary_AST();
 
-    // Находит значение Абстрактного Синтаксического Дерева (АСД)
+    // Находит значение АСД
     double getValue() override;
 
 private:
     std::string operation;
     Base_AST *first, *second;
+    Unit unit;
 
 };
+
 
 /*
 Класс исключений парсинга
@@ -117,9 +123,6 @@ private:
 
 };
 
-
-// Энумерация единиц измерения углов
-enum class Unit { Any, Degrees, Radians };
 
 // Находит значение выражение
 extern double solveExpression(std::string expr, Unit unit = Unit::Any);
@@ -166,28 +169,31 @@ extern std::vector<std::string> binaryFunctions;
 // Regex for determining if a string is a number
 extern std::regex numberRegex;
 
+// Enumeration of angle measurment units
+enum class Unit { Any, Degrees, Radians };
+
 /*
-Abstract Syntax Tree (AST) parent class
+AST parent class
 */
 class Base_AST {
 public:
     Base_AST(void);
     ~Base_AST(void);
 
-    // Evaluates the Abstract Syntax Tree (AST)
+    // Evaluates the AST
     virtual double getValue(void);
 
 protected:
     // Evaluate a unary function by name
-    static double applyUnary(std::string fun, double arg);
+    static double applyUnary(std::string fun, double arg, Unit unit);
     // Evaluate a binary function by name
-    static double applyBinary(std::string fun, double arg1, double arg2);
+    static double applyBinary(std::string fun, double arg1, double arg2, Unit unit);
 
 };
 
 
 /*
-Abstract Syntax Tree (AST) node class for storing values
+AST node class for storing values
 */
 class Value_AST : public Base_AST {
 public:
@@ -204,14 +210,14 @@ private:
 
 
 /*
-Abstract Syntax Tree (AST) node class for storing unary functions (functions with one parameter)
+AST node class for storing unary functions (functions with one parameter)
 */
 class Unary_AST : public Base_AST {
 public:
     Unary_AST(std::string function, Base_AST *inner);
     ~Unary_AST(void);
 
-    // Evaluates the Abstract Syntax Tree (AST)
+    // Evaluates the AST
     double getValue(void) override;
 
 private:
@@ -222,14 +228,14 @@ private:
 
 
 /*
-Abstract Syntax Tree (AST) node class for storing binary functions/operations (functions with two parameters)
+AST node class for storing binary functions/operations (functions with two parameters)
 */
 class Binary_AST : public Base_AST {
 public:
     Binary_AST(std::string operation, Base_AST *first, Base_AST *second);
     ~Binary_AST(void);
 
-    // Evaluates the Abstract Syntax Tree (AST)
+    // Evaluates the AST
     double getValue(void) override;
 
 private:
@@ -237,6 +243,7 @@ private:
     Base_AST *first, *second;
 
 };
+
 
 /*
 Parsing Exception class
@@ -256,9 +263,6 @@ private:
 
 };
 
-
-// Enumeration of angle measurment units
-enum class Unit { Any, Degrees, Radians };
 
 // Evaluates the expression
 extern double solveExpression(std::string expr, Unit unit = Unit::Any);
