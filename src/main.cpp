@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
         }
         
         try {
-            std::cout << MathParser::solveExpression(expr) << std::endl;
+            std::cout << MathParser::solveExpression(expr, MathParser::Unit::Degrees) << std::endl;
         } catch (MathParser::Exception &ex) {
             std::cout << ex.what() << std::endl;
         }

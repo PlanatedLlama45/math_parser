@@ -26,7 +26,7 @@ std::map<std::string, uint8_t> PEMDAS = {
     {"^", 3}
 };
 std::vector<std::string> binaryOperators = {"+", "-", "*", "/", "^", "%", "mod"};
-std::vector<std::string> binaryFunctions = {"log", "root", "mod", "nCr", "ncr", "nPr", "npr", "atan2", "arctan2"};
+std::vector<std::string> binaryFunctions = {"log", "root", "mod", "nCr", "ncr", "nPr", "npr"};
 std::vector<std::string> unaryFunctions = {
     "sqrt", "cbrt", "lg", "ln", "sin", "cos", "tan", "tg", "csc", "cosec", "sec", "cot", "ctg", "cotan", "sinh", "sh",
     "cosh", "ch", "tanh", "th", "csch", "cosech", "sech", "sch", "coth", "cth", "arcsin", "asin", "arccos", "acos",
@@ -86,39 +86,13 @@ Base_AST *parseExpression(std::string expr, Unit unit) {
     // *std::cout << expr << '\n';
 
     // Return 'Value_AST' if is a number
-    if (std::regex_match(expr, numberRegex)) {
-        if (unit == Unit::Degrees)
-            return new Value_AST(rad2deg(std::stod(expr)));
+    if (std::regex_match(expr, numberRegex))
         return new Value_AST(std::stod(expr));
-    }
 
     // Return 'Value_AST' if is a constant
-    if (constants[expr] != 0.) {
-        if (unit == Unit::Degrees)
-            return new Value_AST(rad2deg(constants[expr]));
+    if (constants[expr] != 0.)
         return new Value_AST(constants[expr]);
-    }
-    
-    // Return 'Value_AST' if is in degrees
-    if (expr.length() > 3 &&
-        getSubString(expr, expr.length() - 3, expr.length()) == "deg" &&
-        std::regex_match(getSubString(expr, 0, expr.length() - 3), numberRegex)
-    ) {
-        if (unit == Unit::Degrees)
-            return new Value_AST(std::stod(getSubString(expr, 0, expr.length() - 3)));
-        return new Value_AST(deg2rad(std::stod(getSubString(expr, 0, expr.length() - 3))));
-    }
 
-    // Return 'Value_AST' if is in radians
-    if (expr.length() > 3 &&
-        getSubString(expr, expr.length() - 3, expr.length()) == "rad" &&
-        std::regex_match(getSubString(expr, 0, expr.length() - 3), numberRegex)
-    ) {
-        if (unit == Unit::Radians)
-            return new Value_AST(std::stod(getSubString(expr, 0, expr.length() - 3)));
-        return new Value_AST(rad2deg(std::stod(getSubString(expr, 0, expr.length() - 3))));
-    }
-    
     // Get lowest order operation
     {
         size_t depth = 0, i, j, k, li = 0, lj = 0, lk = 0;
@@ -192,19 +166,19 @@ Base_AST *parseExpression(std::string expr, Unit unit) {
             if (contains(binaryOperators, oper)) {
                 Base_AST *first = parseExpression(getSubString(expr, 0, li), unit);
                 Base_AST *second = parseExpression(getSubString(expr, lj, expr.length()), unit);
-                return (first == nullptr || second == nullptr) ? nullptr : new Binary_AST(oper, first, second);
+                return (first == nullptr || second == nullptr) ? nullptr : new Binary_AST(oper, first, second, unit);
             } else if (contains(binaryFunctions, oper)) {
                 auto args = splitAt(getSubString(expr, lj + 1, lk), ',');
                 if (args.size() != 2)
                     throw Exception("Incorrect amount of arguments");
                 Base_AST *first = parseExpression(args[0], unit);
                 Base_AST *second = parseExpression(args[1], unit);
-                return (first == nullptr || second == nullptr) ? nullptr : new Binary_AST(oper, first, second);
+                return (first == nullptr || second == nullptr) ? nullptr : new Binary_AST(oper, first, second, unit);
             }
         } else {
             std::string oper = getSubString(expr, li, lj);
             Base_AST *inner = parseExpression(getSubString(expr, lj + 1, lk), unit);
-            return (inner == nullptr) ? nullptr : new Unary_AST(oper, inner);
+            return (inner == nullptr) ? nullptr : new Unary_AST(oper, inner, unit);
         }
     }
 
@@ -245,101 +219,82 @@ double Base_AST::applyUnary(std::string fun, double arg, Unit unit) {
         return std::log(arg);
 
     // Trig
-    double res = 0.0;
-    bool inverse = false;
+    auto trydeg2rad = [unit] (double val) -> double {
+        if (unit == Unit::Degrees)
+            return deg2rad(val);
+        return val;
+    };
     // Normal trig
     if (fun == "sin")
-        res = std::sin(arg);
+        return std::sin(trydeg2rad(arg));
     else if (fun == "cos")
-        res = std::cos(arg);
+        return std::cos(trydeg2rad(arg));
     else if (fun == "tan" || fun == "tg")
-        res = std::tan(arg);
+        return std::tan(trydeg2rad(arg));
 
     // Complements
     else if (fun == "csc" || fun == "cosec")
-        res = 1. / std::sin(arg);
+        return 1. / std::sin(trydeg2rad(arg));
     else if (fun == "sec")
-        res = 1. / std::cos(arg);
+        return 1. / std::cos(trydeg2rad(arg));
     else if (fun == "cot" || fun == "ctg" || fun == "cotan")
-        res = 1. / std::tan(arg);
+        return 1. / std::tan(trydeg2rad(arg));
 
     // Hyperbolic trig
     else if (fun == "sinh" || fun == "sh")
-        res = std::sinh(arg);
+        return std::sinh(trydeg2rad(arg));
     else if (fun == "cosh" || fun == "ch")
-        res = std::cosh(arg);
+        return std::cosh(trydeg2rad(arg));
     else if (fun == "tanh" || fun == "th")
-        res = std::tanh(arg);
+        return std::tanh(trydeg2rad(arg));
 
     // Complements    
     else if (fun == "csch" || fun == "cosech")
-        res = 1. / std::sinh(arg);
+        return 1. / std::sinh(trydeg2rad(arg));
     else if (fun == "sech" || fun == "sch")
-        res = 1. / std::cosh(arg);
+        return 1. / std::cosh(trydeg2rad(arg));
     else if (fun == "coth" || fun == "cth")
-        res = 1. / std::tanh(arg);
+        return 1. / std::tanh(trydeg2rad(arg));
 
     // Inverse trig
+    auto tryrad2deg = [unit] (double val) -> double {
+        if (unit == Unit::Degrees)
+            return rad2deg(val);
+        return val;
+    };
     // Normal trig
-    else if (fun == "arcsin" || fun == "asin") {
-        res = std::asin(arg);
-        inverse = true;
-    }
-    else if (fun == "arccos" || fun == "acos") {
-        res = std::acos(arg);
-        inverse = true;
-    }
-    else if (fun == "arctan" || fun == "arctg" || fun == "atan") {
-        res = std::tan(arg);
-        inverse = true;
-    }
+    if (fun == "arcsin" || fun == "asin")
+        return tryrad2deg(std::asin(arg));
+    else if (fun == "arccos" || fun == "acos")
+        return tryrad2deg(std::acos(arg));
+    else if (fun == "arctan" || fun == "arctg" || fun == "atan")
+        return tryrad2deg(std::tan(arg));
 
     // Complements
-    else if (fun == "arcsc" || fun == "arccosec") {
-        res = std::asin(1. / arg);
-        inverse = true;
-    }
-    else if (fun == "arsec" || fun == "arcsec") {
-        res = std::acos(1. / arg);
-        inverse = true;
-    }
-    else if (fun == "arccot" || fun == "arcctg" || fun == "arccotan") {
-        res = std::atan(1. / arg);
-        inverse = true;
-    }
+    else if (fun == "arcsc" || fun == "arccosec")
+        return tryrad2deg(std::asin(1. / arg));
+    else if (fun == "arsec" || fun == "arcsec")
+        return tryrad2deg(std::acos(1. / arg));
+    else if (fun == "arccot" || fun == "arcctg" || fun == "arccotan")
+        return tryrad2deg(std::atan(1. / arg));
 
     // Hyperbolic trig
-    else if (fun == "arsinh" || fun == "arsh") {
-        res = std::asinh(arg);
-        inverse = true;
-    }
-    else if (fun == "arcosh" || fun == "arch") {
-        res = std::acosh(arg);
-        inverse = true;
-    }
-    else if (fun == "artanh" || fun == "arth") {
-        res = std::atanh(arg);
-        inverse = true;
-    }
+    else if (fun == "arsinh" || fun == "arsh")
+        return tryrad2deg(std::asinh(arg));
+    else if (fun == "arcosh" || fun == "arch")
+        return tryrad2deg(std::acosh(arg));
+    else if (fun == "artanh" || fun == "arth")
+        return tryrad2deg(std::atanh(arg));
 
     // Complements    
-    else if (fun == "arcsch" || fun == "arcosech") {
-        res = std::asinh(1. / arg);
-        inverse = true;
-    }
-    else if (fun == "arsech" || fun == "arsch") {
-        res = std::acosh(1. / arg);
-        inverse = true;
-    }
-    else if (fun == "arcoth" || fun == "arcth") {
-        res = std::atanh(1. / arg);
-        inverse = true;
-    }
+    else if (fun == "arcsch" || fun == "arcosech")
+        return tryrad2deg(std::asinh(1. / arg));
+    else if (fun == "arsech" || fun == "arsch")
+        return tryrad2deg(std::acosh(1. / arg));
+    else if (fun == "arcoth" || fun == "arcth")
+        return tryrad2deg(std::atanh(1. / arg));
 
-    if (inverse && unit == Unit::Degrees)
-        res = rad2deg(res);
-
-    return res;
+    return 0.;
 }
 
 double Base_AST::applyBinary(std::string fun, double arg1, double arg2, Unit unit) {
@@ -368,14 +323,6 @@ double Base_AST::applyBinary(std::string fun, double arg1, double arg2, Unit uni
         return nCr(arg1, arg2);
     else if (fun == "nPr" || fun == "npr")
         return nCr(arg1, arg2);
-    
-    // Trig
-    else if (fun == "atan2" || fun == "arctan2") {
-        double res = std::atan2(arg1, arg2);
-        if (unit == Unit::Degrees)
-            return rad2deg(res);
-        return res;
-    }
 
     return 0.;
 }

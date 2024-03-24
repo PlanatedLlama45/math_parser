@@ -28,7 +28,7 @@ extern std::vector<std::string> binaryFunctions;
 extern std::regex numberRegex;
 
 // Энумерация единиц измерения углов
-enum class Unit { Any, Degrees, Radians };
+enum class Unit { Degrees, Radians };
 
 /*
 Родительский класс для АСД
@@ -72,7 +72,7 @@ private:
 */
 class Unary_AST : public Base_AST {
 public:
-    Unary_AST(std::string function, Base_AST *inner, Unit unit = Unit::Any);
+    Unary_AST(std::string function, Base_AST *inner, Unit unit = Unit::Radians);
     ~Unary_AST();
 
     // Находит значение АСД
@@ -91,7 +91,7 @@ private:
 */
 class Binary_AST : public Base_AST {
 public:
-    Binary_AST(std::string operation, Base_AST *first, Base_AST *second, Unit unit = Unit::Any);
+    Binary_AST(std::string operation, Base_AST *first, Base_AST *second, Unit unit = Unit::Radians);
     ~Binary_AST();
 
     // Находит значение АСД
@@ -125,10 +125,10 @@ private:
 
 
 // Находит значение выражение
-extern double solveExpression(std::string expr, Unit unit = Unit::Any);
+extern double solveExpression(std::string expr, Unit unit = Unit::Radians);
 
 // Парсит выражение и возвращает АСД
-extern Base_AST *parseExpression(std::string expr, Unit unit = Unit::Any);
+extern Base_AST *parseExpression(std::string expr, Unit unit = Unit::Radians);
 
 // Проверяет действительно ли выражение (пока что проверяет только скобки)
 extern bool isValidExpression(std::string expr);
@@ -170,7 +170,7 @@ extern std::vector<std::string> binaryFunctions;
 extern std::regex numberRegex;
 
 // Enumeration of angle measurment units
-enum class Unit { Any, Degrees, Radians };
+enum class Unit { Degrees, Radians };
 
 /*
 AST parent class
@@ -214,7 +214,7 @@ AST node class for storing unary functions (functions with one parameter)
 */
 class Unary_AST : public Base_AST {
 public:
-    Unary_AST(std::string function, Base_AST *inner);
+    Unary_AST(std::string function, Base_AST *inner, Unit unit = Unit::Radians);
     ~Unary_AST(void);
 
     // Evaluates the AST
@@ -232,7 +232,7 @@ AST node class for storing binary functions/operations (functions with two param
 */
 class Binary_AST : public Base_AST {
 public:
-    Binary_AST(std::string operation, Base_AST *first, Base_AST *second);
+    Binary_AST(std::string operation, Base_AST *first, Base_AST *second, Unit unit = Unit::Radians);
     ~Binary_AST(void);
 
     // Evaluates the AST
@@ -265,10 +265,10 @@ private:
 
 
 // Evaluates the expression
-extern double solveExpression(std::string expr, Unit unit = Unit::Any);
+extern double solveExpression(std::string expr, Unit unit = Unit::Radians);
 
 // Parses the expression and returns an AST
-extern Base_AST *parseExpression(std::string expr, Unit unit = Unit::Any);
+extern Base_AST *parseExpression(std::string expr, Unit unit = Unit::Radians);
 
 // Checks if an expression is valid (for now only checks parenthesis)
 extern bool isValidExpression(std::string expr);

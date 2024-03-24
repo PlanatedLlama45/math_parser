@@ -19,7 +19,7 @@
 - Тригонометрия:
     - Обычная (sin, cos, и т.п.)
     - Гиперболическая (sinh, cosh, и т.п.)
-    - Обратная (arcsin/asin, arsinh, arcosh, atan2(y, x), и т.п.)
+    - Обратная (arcsin/asin, arsinh, arcosh, и т.п.)
 - Логарифмы (ln(x), lg(x), log(b, x))
 - Комбинаторика (ncr(a, b), npr(a, b))
 
@@ -56,7 +56,7 @@ Is an exception type thrown by MathParser::parseExpression and MathParser::solve
 - Trigonometry:
     - Regular (sin, cos, etc.)
     - Hyperbolic (sinh, cosh, etc.)
-    - Inverted (arcsin/asin, arsinh, arcosh, atan2(y, x), etc.)
+    - Inverted (arcsin/asin, arsinh, arcosh, etc.)
 - Logarithms (ln(x), lg(x), log(b, x))
 - Combination (ncr(a, b), npr(a, b))
 
